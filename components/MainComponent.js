@@ -16,7 +16,7 @@ import { connect } from 'react-redux';
 import { fetchCampsites, fetchComments, fetchPromotions, fetchPartners } from '../redux/ActionCreators';
 import Favorites from './FavoritesComponent';
 import Login from './LoginComponent';
-import * as Notifications from 'expo-notifications';
+
 
 const mapDispatchToProps = {
     fetchCampsites,

@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, ScrollView, FlatList,
-    Modal, Button, StyleSheet,
-    Alert, PanResponder } from 'react-native';
+import { Text, View, ScrollView, FlatList, Modal, Button, StyleSheet, Alert, PanResponder } from 'react-native';
 import { Card, Icon, Rating, Input } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { baseUrl } from '../shared/baseUrl';
@@ -18,7 +16,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps= {
     postFavorite: campsiteId => (postFavorite(campsiteId)),
-    postComment: (campsiteId, rating, author, text) => postComment(campsiteId, rating, author, text)
+    postComment: (campsiteId, rating, author, text) => (postComment(campsiteId, rating, author, text))
 };
 
 function RenderCampsite(props) {
@@ -28,6 +26,8 @@ function RenderCampsite(props) {
     const view = React.createRef();
 
     const recognizeDrag = ({dx}) => (dx < -200) ? true : false;
+
+    const recognizeComment = ({dx}) => (dx > 200) ? true : false;
 
     const panResponder = PanResponder.create({
         onStartShouldSetPanResponder: () => true,
@@ -55,6 +55,8 @@ function RenderCampsite(props) {
                     ],
                     { cancelable: false }
                 );
+            } else if (recognizeComment(gestureState)) {
+                props.onShowModal();
             }
             return true;
         }
@@ -70,8 +72,7 @@ function RenderCampsite(props) {
                 {...panResponder.panHandlers}>
                 <Card
                     featuredTitle={campsite.name}
-                    image={{uri: baseUrl + campsite.image}}
-                    >
+                    image={{uri: baseUrl + campsite.image}}>
                     <Text style={{margin: 10}}>
                         {campsite.description}
                     </Text>
@@ -82,14 +83,11 @@ function RenderCampsite(props) {
                             color='#f50'
                             raised
                             reverse
-                            onPress={() => 
-                                props.favorite 
-                                    ? console.log('Already set as a favorite') 
-                                    : props.markFavorite()
-                                }
+                            onPress={() => props.favorite ? 
+                                console.log('Already set as a favorite') : props.markFavorite()}
                         />
                         <Icon
-                            name={'pencil'}
+                            name='pencil'
                             type='font-awesome'
                             color='#5637DD'
                             raised
@@ -109,9 +107,7 @@ function RenderComments({comments}) {
     const renderCommentItem = ({item}) => {
         return (
             <View style={{margin: 10}}>
-                <Text style={{fontSize: 14}}>
-                    {item.text}
-                </Text>
+                <Text style={{fontSize: 14}}>{item.text}</Text>
                 <Rating
                     startingValue={item.rating}
                     imageSize={10}
@@ -121,9 +117,7 @@ function RenderComments({comments}) {
                         paddingVertical: '5%'
                     }}
                     readonly />
-                <Text style={{fontSize: 12}}>
-                    {`-- ${item.author}, ${item.date}`}
-                </Text>
+                <Text style={{fontSize: 12}}>{`-- ${item.author}, ${item.date}`}</Text>
             </View>
         );
     };
@@ -209,14 +203,14 @@ class CampsiteInfo extends Component {
                             leftIcon={{type: 'font-awesome', name: 'user-o'}}
                             leftIconContainerStyle={{paddingRight: 10}}
                             onChangeText={author => this.setState({author: author})}
-                            value={this.author}
+                            value={this.state.author}
                         />
                         <Input
                             placeholder='Comment'
                             leftIcon={{type: 'font-awesome', name: 'comment-o'}}
                             leftIconContainerStyle={{paddingRight: 10}}
                             onChangeText={text => this.setState({text: text})}
-                            value={this.text}
+                            value={this.state.text}
                         />
                         <View style={{margin:10}}>
                             <Button
